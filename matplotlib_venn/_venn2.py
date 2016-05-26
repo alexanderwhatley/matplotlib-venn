@@ -1,10 +1,8 @@
 '''
 Venn diagram plotting routines.
 Two-circle venn plotter.
-
 Copyright 2012, Konstantin Tretyakov.
 http://kt.era.ee/
-
 Licensed under MIT license.
 '''
 # Make sure we don't try to do GUI stuff when running tests
@@ -12,7 +10,6 @@ import sys, os
 if 'py.test' in os.path.basename(sys.argv[0]): # (XXX: Ugly hack)
     import matplotlib
     matplotlib.use('Agg')
-from collections import Counter
 
 import numpy as np
 import warnings
@@ -33,7 +30,6 @@ def compute_venn2_areas(diagram_areas, normalize_to=1.0):
      (Ab, aB, AB)  (i.e. last element corresponds to the size of intersection A&B&C).
     The return value is a list of areas (A, B, AB), such that the total area is normalized
     to normalize_to. If total area was 0, returns (1e-06, 1e-06, 0.0)
-
     Assumes all input values are nonnegative (to be more precise, all areas are passed through and abs() function)
     >>> compute_venn2_areas((1, 1, 0))
     (0.5, 0.5, 0.0)
@@ -61,10 +57,8 @@ def solve_venn2_circles(venn_areas):
     finds the positions and radii of the two circles.
     The return value is a tuple (coords, radii), where coords is a 2x2 array of coordinates and
     radii is a 2x1 array of circle radii.
-
     Assumes the input values to be nonnegative and not all zero.
     In particular, the first two values must be positive.
-
     >>> c, r = solve_venn2_circles((1, 1, 0))
     >>> np.round(r, 3)
     array([ 0.564,  0.564])
@@ -106,7 +100,6 @@ def compute_venn2_colors(set_colors):
     '''
     Given two base colors, computes combinations of colors corresponding to all regions of the venn diagram.
     returns a list of 3 elements, providing colors for regions (10, 01, 11).
-
     >>> compute_venn2_colors(('r', 'g'))
     (array([ 1.,  0.,  0.]), array([ 0. ,  0.5,  0. ]), array([ 0.7 ,  0.35,  0.  ]))
     '''
@@ -145,20 +138,10 @@ def compute_venn2_subsets(a, b):
     ...
     ValueError: Both arguments must be of the same type
     '''
-<<<<<<< HEAD
-    if not ((type(a) == type(b) == set) or (type(a) == type(b) == Counter)):
-        raise Exception("The subsets must be either of type set or Counter.")
-    else:
-        if type(a) == type(b) == set:
-            return (len(a - b), len(b - a), len(a.intersection(b)))
-        else:
-            return (sum((a - b).values()), sum((b - a).values()), sum((a & b).values()))
-=======
     if not (type(a) == type(b)):
         raise ValueError("Both arguments must be of the same type")
     set_size = len if type(a) != Counter else lambda x: sum(x.values())   # We cannot use len to compute the cardinality of a Counter
     return (set_size(a - b), set_size(b - a), set_size(a & b))
->>>>>>> refs/remotes/konstantint/master
 
 
 def venn2_circles(subsets, normalize_to=1.0, alpha=1.0, color='black', linestyle='solid', linewidth=2.0, ax=None, **kwargs):
@@ -168,7 +151,6 @@ def venn2_circles(subsets, normalize_to=1.0, alpha=1.0, color='black', linestyle
     parameters ``subsets``, ``normalize_to`` and ``ax`` are the same as in venn2()
     ``kwargs`` are passed as-is to matplotlib.patches.Circle.
     returns a list of three Circle patches.
-
     >>> c = venn2_circles((1, 2, 3))
     >>> c = venn2_circles({'10': 1, '01': 2, '11': 3}) # Same effect
     >>> c = venn2_circles([set([1,2,3,4]), set([2,3,4,5,6])]) # Also same effect
@@ -200,11 +182,9 @@ def venn2(subsets, set_labels=('A', 'B'), set_colors=('r', 'g'), alpha=0.4, norm
        {'10': 10, '01': 20, '11': 40}. Unmentioned codes are considered to map to 0.
      - A list (or a tuple) with three numbers, denoting the sizes of the regions in the following order:
        (10, 01, 11)
-
     ``set_labels`` parameter is a list of two strings - set labels. Set it to None to disable set labels.
     The ``set_colors`` parameter should be a list of two elements, specifying the "base colors" of the two circles.
     The color of circle intersection will be computed based on those.
-
     The ``normalize_to`` parameter specifies the total (on-axes) area of the circles to be drawn. Sometimes tuning it (together
     with the overall fiture size) may be useful to fit the text labels better.
     The return value is a ``VennDiagram`` object, that keeps references to the ``Text`` and ``Patch`` objects used on the plot
