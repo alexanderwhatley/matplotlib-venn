@@ -16,6 +16,7 @@ from collections import Counter
 
 import numpy as np
 import warnings
+from collections import Counter
 
 from matplotlib.patches import Circle
 from matplotlib.colors import ColorConverter
@@ -116,20 +117,35 @@ def compute_venn2_colors(set_colors):
 
 def compute_venn2_subsets(a, b):
     '''
-    Given two set objects, computes the sizes of (a & ~b, b & ~a, a & b).
+    Given two set or Counter objects, computes the sizes of (a & ~b, b & ~a, a & b).
     Returns the result as a tuple.
 
     >>> compute_venn2_subsets(set([1,2,3,4]), set([2,3,4,5,6]))
     (1, 2, 3)
+    >>> compute_venn2_subsets(Counter([1,2,3,4]), Counter([2,3,4,5,6]))
+    (1, 2, 3)
+    >>> compute_venn2_subsets(Counter([]), Counter([]))
+    (0, 0, 0)
     >>> compute_venn2_subsets(set([]), set([]))
     (0, 0, 0)
     >>> compute_venn2_subsets(set([1]), set([]))
     (1, 0, 0)
     >>> compute_venn2_subsets(set([1]), set([1]))
     (0, 0, 1)
+    >>> compute_venn2_subsets(Counter([1]), Counter([1]))
+    (0, 0, 1)
     >>> compute_venn2_subsets(set([1,2]), set([1]))
     (1, 0, 1)
+    >>> compute_venn2_subsets(Counter([1,1,2,2,2]), Counter([1,2,3,3]))
+    (3, 2, 2)
+    >>> compute_venn2_subsets(Counter([1,1,2]), Counter([1,2,2]))
+    (1, 1, 2)
+    >>> compute_venn2_subsets(Counter([1,1]), set([]))
+    Traceback (most recent call last):
+    ...
+    ValueError: Both arguments must be of the same type
     '''
+<<<<<<< HEAD
     if not ((type(a) == type(b) == set) or (type(a) == type(b) == Counter)):
         raise Exception("The subsets must be either of type set or Counter.")
     else:
@@ -137,6 +153,12 @@ def compute_venn2_subsets(a, b):
             return (len(a - b), len(b - a), len(a.intersection(b)))
         else:
             return (sum((a - b).values()), sum((b - a).values()), sum((a & b).values()))
+=======
+    if not (type(a) == type(b)):
+        raise ValueError("Both arguments must be of the same type")
+    set_size = len if type(a) != Counter else lambda x: sum(x.values())   # We cannot use len to compute the cardinality of a Counter
+    return (set_size(a - b), set_size(b - a), set_size(a & b))
+>>>>>>> refs/remotes/konstantint/master
 
 
 def venn2_circles(subsets, normalize_to=1.0, alpha=1.0, color='black', linestyle='solid', linewidth=2.0, ax=None, **kwargs):
